@@ -6,12 +6,15 @@ const sendToWormhole = require('stream-wormhole')
 const download = require('image-downloader')
 
 class testUploadController extends Controller {
-  constructor (ctx){
+  constructor(ctx) {
     super(ctx)
   }
 
   async create() {
-    const { ctx, service } = this
+    const {
+      ctx,
+      service
+    } = this
     const stream = await ctx.getFileStream()
     const mkdir = await ctx.helper.uploadmk(this)
     const filename = path.basename(stream.filename)
@@ -20,7 +23,7 @@ class testUploadController extends Controller {
     attachment.extname = extname
     attachment.filename = filename
     attachment.url = `/${mkdir}/${attachment._id.toString()}${extname}`
-    const target = path.join(this.config.baseDir, this.config.llpath.upload  + mkdir, `${attachment._id.toString()}${attachment.extname}`)
+    const target = path.join(this.config.baseDir, this.config.llpath.upload + mkdir, `${attachment._id.toString()}${attachment.extname}`)
     const writeStream = fs.createWriteStream(target)
     try {
       await awaitWriteStream(stream.pipe(writeStream))
@@ -30,19 +33,27 @@ class testUploadController extends Controller {
     }
     // 调用 Service 进行业务处理
     const res = {}
-    ctx.helper.success({ctx, res})
+    ctx.helper.success({
+      ctx,
+      res
+    })
   }
 
   // 通过URL添加单个图片: 如果网络地址不合法，EGG会返回500错误
   async url() {
-    const { ctx, service } = this
+    const {
+      ctx,
+      service
+    } = this
     const attachment = new this.ctx.model.Attachment
-    const { url } = ctx.request.body
+    const {
+      url
+    } = ctx.request.body
     const filename = path.basename(url)
     const extname = path.extname(url).toLowerCase()
     const options = {
       url: url,
-      dest: path.join(this.config.baseDir, this.config.llpath.upload , `${attachment._id.toString()}${extname}`)
+      dest: path.join(this.config.baseDir, this.config.llpath.upload, `${attachment._id.toString()}${extname}`)
     }
     let res
     try {
@@ -53,14 +64,21 @@ class testUploadController extends Controller {
       // 调用 Service 进行业务处理
       res = {}
     } catch (err) {
+      console.log('error', err)
       throw err
     }
-    ctx.helper.success({ctx, res})
+    ctx.helper.success({
+      ctx,
+      res
+    })
   }
 
   // 上传多个文件
   async multiple() {
-    const { ctx, service } = this
+    const {
+      ctx,
+      service
+    } = this
     const parts = ctx.multipart()
     const res = {}
     const files = []
@@ -84,13 +102,13 @@ class testUploadController extends Controller {
         console.log('extname: ' + part.extname)
         console.log('encoding: ' + part.encoding)
         console.log('mime: ' + part.mime)
-        const filename = part.filename.toLowerCase()// 文件名称
+        const filename = part.filename.toLowerCase() // 文件名称
         const extname = path.extname(part.filename).toLowerCase() // 文件扩展名称
         const attachment = new ctx.model.Attachment
         attachment.extname = extname
         attachment.filename = filename
         attachment.url = `/${attachment._id.toString()}${extname}`
-        const target = path.join(this.config.baseDir, this.config.llpath.upload , `${attachment._id.toString()}${extname}`)
+        const target = path.join(this.config.baseDir, this.config.llpath.upload, `${attachment._id.toString()}${extname}`)
         const writeStream = fs.createWriteStream(target)
         let res
         try {
@@ -104,7 +122,10 @@ class testUploadController extends Controller {
         files.push(`${attachment._id}`)
       }
     }
-    ctx.helper.success({ctx, res})
+    ctx.helper.success({
+      ctx,
+      res
+    })
   }
 
 }

@@ -12,3 +12,4 @@ __MACOSX/
 *.sw*
 *.un~
 #.vscode/
+apidoc
